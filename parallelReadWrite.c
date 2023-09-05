@@ -72,34 +72,44 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+// Assign a task to thread
 void *RandomTaskHandler(void *rank)
 {
     long my_rank = (long)rank;
 
     int (*functions[])() = {Member, Insert, Delete};
-    int counts[] = {0, 0, 0};
     int counts_per_thread[] = {member_count_per_thread, insert_count_per_thread, delete_count_per_thread};
 
-    int totalCalls = member_count_per_thread + insert_count_per_thread + delete_count_per_thread;
-    int remainingCalls = totalCalls;
+    int totalCalls_per_thread = member_count_per_thread + insert_count_per_thread + delete_count_per_thread;
 
-    while (remainingCalls > 0)
+    // Execute calls assigned to thread
+    while (totalCalls_per_thread > 0)
     {
         int randomIndex = rand() % 3;
-        if (counts[randomIndex] < counts_per_thread[randomIndex])
+
+        // Pick a task out of remaining task
+        if (counts_per_thread[randomIndex] > 0)
         {
+            // If the task is a Member function
             if (randomIndex == 0)
-            {
+            {   
+                //Engage read lock
                 pthread_rwlock_rdlock(&list_rw_lock);
             }
             else
             {
+                // Engage write lock for insert and delete
                 pthread_rwlock_wrlock(&list_rw_lock);
             }
+
+            // Perform task on the linked list
             functions[randomIndex](RandomIntegerGenerator(), &head_p);
+
+            //Release read write lock
             pthread_rwlock_unlock(&list_rw_lock);
-            counts[randomIndex]++;
-            remainingCalls--;
+
+            counts_per_thread[randomIndex]--;
+            totalCalls_per_thread--;
         }
     }
 
