@@ -47,9 +47,9 @@ int main(int argc, char *argv[])
     head_p = malloc(sizeof(struct list_node_s));
     Populate(head_p, n);
 
-    start_time = clock();
-
     thread_handles = malloc(thread_count * sizeof(pthread_t));
+    
+    start_time = clock();
 
     for (thread = 0; thread < thread_count; thread++)
     {
@@ -61,11 +61,16 @@ int main(int argc, char *argv[])
         pthread_join(thread_handles[thread], NULL);
     }
 
+    end_time = clock();
+    
     free(thread_handles);
 
-    end_time = clock();
     cpu_time_used = ((double)(end_time - start_time)) / (CLOCKS_PER_SEC);
     printf(" Start to End Duration (CPU): %f s\n", cpu_time_used);
+
+    FILE *fp = fopen("./results/oneMutex_3t.txt", "a");
+    fprintf(fp, "%lf\n", cpu_time_used);
+    fclose(fp);
 
     pthread_mutex_destroy(&list_mutex);
 
