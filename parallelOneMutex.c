@@ -72,28 +72,32 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+// Assign a task to thread
 void *RandomTaskHandler(void *rank)
 {
     long my_rank = (long)rank;
 
     int (*functions[])() = {Member, Insert, Delete};
-    int counts[] = {0, 0, 0};
-    int counts_per_thread[] = {member_count_per_thread, insert_count_per_thread, delete_count_per_thread};
+    int calls_per_thread[] = {member_count_per_thread, insert_count_per_thread, delete_count_per_thread};
 
-    int totalCalls = member_count_per_thread + insert_count_per_thread + delete_count_per_thread;
-    int remainingCalls = totalCalls;
+    int totalCalls_per_thread = member_count_per_thread + insert_count_per_thread + delete_count_per_thread;
 
-    while (remainingCalls > 0)
+    // Execute calls assigned to thread
+    while (totalCalls_per_thread > 0)
     {
         int randomIndex = rand() % 3;
 
-        if (counts[randomIndex] < counts_per_thread[randomIndex])
+        // Pick a task out of remaining task
+        if (calls_per_thread[randomIndex] > 0)
         {
+            // Engage the mutex lock
             pthread_mutex_lock(&list_mutex);
+            // Perform task on the linked list
             functions[randomIndex](RandomIntegerGenerator(), &head_p);
+            // Release mutex lock
             pthread_mutex_unlock(&list_mutex);
-            counts[randomIndex]++;
-            remainingCalls--;
+            calls_per_thread[randomIndex]--;
+            totalCalls_per_thread--;
         }
     }
 
