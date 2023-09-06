@@ -70,12 +70,12 @@ int main(int argc, char *argv[])
 
     cpu_time_used = ((double)(end_time - start_time)) / (CLOCKS_PER_SEC);
     printf(" Start to End Duration (CPU): %f s\n", cpu_time_used);
+    
+    pthread_mutex_destroy(&list_mutex);
 
     FILE *fp = fopen(filename, "a");
     fprintf(fp, "%lf\n", cpu_time_used);
     fclose(fp);
-
-    pthread_mutex_destroy(&list_mutex);
 
     return 0;
 }

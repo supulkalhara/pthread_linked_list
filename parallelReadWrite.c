@@ -32,6 +32,8 @@ int main(int argc, char *argv[])
     m_insert = strtod(argv[5], NULL);
     m_delete = strtod(argv[6], NULL);
 
+    char* filename = argv[7];
+
     member_count = m * m_member;
     insert_count = m * m_insert;
     delete_count = m * m_delete;
@@ -68,6 +70,10 @@ int main(int argc, char *argv[])
     printf(" Start to End Duration (CPU): %f s\n", cpu_time_used);
 
     pthread_rwlock_destroy(&list_rw_lock);
+
+    FILE *fp = fopen(filename, "a");
+    fprintf(fp, "%lf\n", cpu_time_used);
+    fclose(fp);
 
     return 0;
 }
