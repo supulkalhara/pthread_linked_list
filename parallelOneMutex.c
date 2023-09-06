@@ -9,6 +9,7 @@ int16_t m;
 float m_member, m_insert, m_delete;
 int member_count, insert_count, delete_count;
 int member_count_per_thread, insert_count_per_thread, delete_count_per_thread;
+
 struct list_node_s *head_p;
 pthread_mutex_t list_mutex;
 
@@ -31,6 +32,8 @@ int main(int argc, char *argv[])
     m_member = strtod(argv[4], NULL);
     m_insert = strtod(argv[5], NULL);
     m_delete = strtod(argv[6], NULL);
+
+    char* filename = argv[7];
 
     member_count = m * m_member;
     insert_count = m * m_insert;
@@ -68,7 +71,7 @@ int main(int argc, char *argv[])
     cpu_time_used = ((double)(end_time - start_time)) / (CLOCKS_PER_SEC);
     printf(" Start to End Duration (CPU): %f s\n", cpu_time_used);
 
-    FILE *fp = fopen("./results/oneMutex_3t.txt", "a");
+    FILE *fp = fopen(filename, "a");
     fprintf(fp, "%lf\n", cpu_time_used);
     fclose(fp);
 
