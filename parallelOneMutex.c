@@ -83,30 +83,22 @@ int main(int argc, char *argv[])
 // Assign a task to thread
 void *RandomTaskHandler(void *rank)
 {
-    long my_rank = (long)rank;
+    for (int i=0; i<member_count_per_thread; i++){
+        pthread_mutex_lock(&list_mutex);
+        Member(RandomIntegerGenerator(), &head_p);
+        pthread_mutex_unlock(&list_mutex);
+    }
 
-    int (*functions[])() = {Member, Insert, Delete};
-    int calls_per_thread[] = {member_count_per_thread, insert_count_per_thread, delete_count_per_thread};
+    for (int i=0; i<insert_count_per_thread; i++){
+        pthread_mutex_lock(&list_mutex);
+        Insert(RandomIntegerGenerator(), &head_p);
+        pthread_mutex_unlock(&list_mutex);
+    }
 
-    int totalCalls_per_thread = member_count_per_thread + insert_count_per_thread + delete_count_per_thread;
-
-    // Execute calls assigned to thread
-    while (totalCalls_per_thread > 0)
-    {
-        int randomIndex = rand() % 3;
-
-        // Pick a task out of remaining task
-        if (calls_per_thread[randomIndex] > 0)
-        {
-            // Engage the mutex lock
-            pthread_mutex_lock(&list_mutex);
-            // Perform task on the linked list
-            functions[randomIndex](RandomIntegerGenerator(), &head_p);
-            // Release mutex lock
-            pthread_mutex_unlock(&list_mutex);
-            calls_per_thread[randomIndex]--;
-            totalCalls_per_thread--;
-        }
+    for (int i=0; i<delete_count_per_thread; i++){
+        pthread_mutex_lock(&list_mutex);
+        Delete(RandomIntegerGenerator(), &head_p);
+        pthread_mutex_unlock(&list_mutex);
     }
 
     return NULL;

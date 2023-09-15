@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Define the directory where your result files are located
-results_dir = "./results"
+results_dir = "./results2"
 
 # Define the cases, implementations, and thread counts
 cases = ["Case1", "Case2", "Case3"]
@@ -24,7 +24,9 @@ for case in cases:
                 "Std": 0.0,
             }
 
-            filename_pattern = f"parallel{implementation.replace('-', '')}_c{case[-1]}_{threads}t.txt"
+            filename_pattern = (
+                f"parallel{implementation.replace('-', '')}_c{case[-1]}_{threads}t.txt"
+            )
             data = []
 
             for filename in os.listdir(results_dir):
@@ -51,29 +53,33 @@ serial_results = {
 for case in cases:
     plt.figure(figsize=(8, 6))
     plt.subplot(2, 1, 1)
-    plt.title(f'{case} - Average Execution Time vs. Number of Threads')
-    plt.xlabel('Number of Threads')
-    plt.ylabel('Average Execution Time')
+    plt.title(f"{case} - Average Execution Time vs. Number of Threads")
+    plt.xlabel("Number of Threads")
+    plt.ylabel("Average Execution Time")
 
     for implementation in implementations:
-        avg_times = [results[case][implementation][threads]["Avg"] for threads in thread_counts]
-        plt.plot(thread_counts, avg_times, marker='o', label=f"{implementation}")
+        avg_times = [
+            results[case][implementation][threads]["Avg"] for threads in thread_counts
+        ]
+        plt.plot(thread_counts, avg_times, marker="o", label=f"{implementation}")
 
     # Add serial results
     serial_avg = serial_results[case]["Avg"]
-    plt.axhline(y=serial_avg, color='r', linestyle='--', label='Serial (1 Thread)')
+    plt.axhline(y=serial_avg, color="r", linestyle="--", label="Serial (1 Thread)")
 
     plt.legend()
     plt.grid(True)
 
     plt.subplot(2, 1, 2)
-    plt.title(f'{case} - Standard Deviation vs. Number of Threads')
-    plt.xlabel('Number of Threads')
-    plt.ylabel('Standard Deviation')
+    plt.title(f"{case} - Standard Deviation vs. Number of Threads")
+    plt.xlabel("Number of Threads")
+    plt.ylabel("Standard Deviation")
 
     for implementation in implementations:
-        std_devs = [results[case][implementation][threads]["Std"] for threads in thread_counts]
-        plt.plot(thread_counts, std_devs, marker='o', label=f"{implementation}")
+        std_devs = [
+            results[case][implementation][threads]["Std"] for threads in thread_counts
+        ]
+        plt.plot(thread_counts, std_devs, marker="o", label=f"{implementation}")
 
     plt.legend()
     plt.grid(True)
@@ -83,19 +89,25 @@ for case in cases:
 
 # Plot all cases in one graph
 plt.figure(figsize=(10, 6))
-plt.title('All Cases - Average Execution Time vs. Number of Threads')
-plt.xlabel('Number of Threads')
-plt.ylabel('Average Execution Time')
+plt.title("All Cases - Average Execution Time vs. Number of Threads")
+plt.xlabel("Number of Threads")
+plt.ylabel("Average Execution Time")
 
 for case in cases:
     for implementation in implementations:
-        avg_times = [results[case][implementation][threads]["Avg"] for threads in thread_counts]
-        plt.plot(thread_counts, avg_times, marker='o', label=f"{implementation} - {case}")
+        avg_times = [
+            results[case][implementation][threads]["Avg"] for threads in thread_counts
+        ]
+        plt.plot(
+            thread_counts, avg_times, marker="o", label=f"{implementation} - {case}"
+        )
 
 # Add serial results
 for case in cases:
     serial_avg = serial_results[case]["Avg"]
-    plt.axhline(y=serial_avg, color='r', linestyle='--', label=f'Serial (1 Thread) - {case}')
+    plt.axhline(
+        y=serial_avg, color="r", linestyle="--", label=f"Serial (1 Thread) - {case}"
+    )
 
 plt.legend()
 plt.grid(True)

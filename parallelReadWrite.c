@@ -49,9 +49,9 @@ int main(int argc, char *argv[])
     head_p = malloc(sizeof(struct list_node_s));
     Populate(head_p, n);
 
-    start_time = clock();
-
     thread_handles = malloc(thread_count * sizeof(pthread_t));
+
+    start_time = clock();
 
     for (thread = 0; thread < thread_count; thread++)
     {
@@ -63,9 +63,10 @@ int main(int argc, char *argv[])
         pthread_join(thread_handles[thread], NULL);
     }
 
+    end_time = clock();
+    
     free(thread_handles);
 
-    end_time = clock();
     cpu_time_used = ((double)(end_time - start_time)) / (CLOCKS_PER_SEC);
     printf(" Start to End Duration (CPU): %f s\n", cpu_time_used);
 
@@ -81,42 +82,22 @@ int main(int argc, char *argv[])
 // Assign a task to thread
 void *RandomTaskHandler(void *rank)
 {
-    long my_rank = (long)rank;
+    for (int i=0; i<member_count_per_thread; i++){
+        pthread_rwlock_rdlock(&list_rw_lock);
+        Member(RandomIntegerGenerator(), &head_p);
+        pthread_rwlock_unlock(&list_rw_lock);
+    }
 
-    int (*functions[])() = {Member, Insert, Delete};
-    int counts_per_thread[] = {member_count_per_thread, insert_count_per_thread, delete_count_per_thread};
+    for (int i=0; i<insert_count_per_thread; i++){
+        pthread_rwlock_wrlock(&list_rw_lock);
+        Insert(RandomIntegerGenerator(), &head_p);
+        pthread_rwlock_unlock(&list_rw_lock);
+    }
 
-    int totalCalls_per_thread = member_count_per_thread + insert_count_per_thread + delete_count_per_thread;
-
-    // Execute calls assigned to thread
-    while (totalCalls_per_thread > 0)
-    {
-        int randomIndex = rand() % 3;
-
-        // Pick a task out of remaining task
-        if (counts_per_thread[randomIndex] > 0)
-        {
-            // If the task is a Member function
-            if (randomIndex == 0)
-            {   
-                //Engage read lock
-                pthread_rwlock_rdlock(&list_rw_lock);
-            }
-            else
-            {
-                // Engage write lock for insert and delete
-                pthread_rwlock_wrlock(&list_rw_lock);
-            }
-
-            // Perform task on the linked list
-            functions[randomIndex](RandomIntegerGenerator(), &head_p);
-
-            //Release read write lock
-            pthread_rwlock_unlock(&list_rw_lock);
-
-            counts_per_thread[randomIndex]--;
-            totalCalls_per_thread--;
-        }
+    for (int i=0; i<delete_count_per_thread; i++){
+        pthread_rwlock_wrlock(&list_rw_lock);
+        Delete(RandomIntegerGenerator(), &head_p);
+        pthread_rwlock_unlock(&list_rw_lock);
     }
 
     return NULL;
