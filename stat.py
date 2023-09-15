@@ -1,6 +1,6 @@
 import numpy as np
 
-filename = "./results/oneMutex_3t.txt"
+filename = "./results/serial_c3_t.txt"
 
 data = []
 with open(filename, "r") as file:

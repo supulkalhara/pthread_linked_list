@@ -8,7 +8,6 @@ int n;
 int16_t m;
 float m_member, m_insert, m_delete;
 
-
 int main(int argc, char* argv[]){
     long thread;
     pthread_t* thread_handles;
@@ -22,6 +21,8 @@ int main(int argc, char* argv[]){
     m_member = strtod(argv[3], NULL);
     m_insert = strtod(argv[4], NULL);
     m_delete = strtod(argv[5], NULL);
+
+    char* filename = argv[6];
 
     int num_member = m*m_member;
     int num_insert = m*m_insert;
@@ -48,6 +49,10 @@ int main(int argc, char* argv[]){
 
     cpu_time_used = ((double) (end_time - start_time)) / CLOCKS_PER_SEC;
     printf(" Start to End Duration (CPU): %f s\n", cpu_time_used);
+
+    FILE *fp = fopen(filename, "a");
+    fprintf(fp, "%lf\n", cpu_time_used);
+    fclose(fp);
 
     return 0;
 }
