@@ -1,4 +1,5 @@
-# Executables
-serial
+cmake-build-debug
+.idea
 parallelOneMutex
 parallelReadWrite
+serial
